@@ -41,6 +41,28 @@
     );
   }
 
+  // AI가 HTML 태그로 답해도 깔끔한 일반 텍스트로 변환 (안전망)
+  function htmlToText(str) {
+    let s = String(str || "");
+    s = s.replace(/<li[^>]*>/gi, "\n• ");
+    s = s.replace(/<br\s*\/?>/gi, "\n");
+    s = s.replace(/<\/(p|li|ul|ol|div|h[1-6])>/gi, "\n");
+    s = s.replace(/<[^>]+>/g, ""); // 남은 태그 제거
+    s = s
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&");
+    return s.replace(/\n{3,}/g, "\n\n").trim();
+  }
+
+  // 안전망 변환 후 화면에 표시할 HTML로 (이스케이프 + 줄바꿈)
+  function toReasonHtml(str) {
+    return escapeHtml(htmlToText(str)).replace(/\n/g, "<br>");
+  }
+
   function addTyping() {
     return addBubble(
       "bot",
@@ -90,8 +112,7 @@
       const data = await postChat({ type: "recommend", gender, birthdate });
       typing.remove();
 
-      const reasonHtml = escapeHtml(data.reason).replace(/\n/g, "<br>");
-      const html = `${renderBalls(data.numbers, data.bonus)}<p class="ai-reason">${reasonHtml}</p>`;
+      const html = `${renderBalls(data.numbers, data.bonus)}<p class="ai-reason">${toReasonHtml(data.reason)}</p>`;
       addBubble("bot", html);
 
       // 후속 대화용 맥락 저장
@@ -128,8 +149,7 @@
     try {
       const data = await postChat({ type: "chat", history, message: text });
       typing.remove();
-      const replyHtml = escapeHtml(data.reply).replace(/\n/g, "<br>");
-      addBubble("bot", `<p class="ai-reason">${replyHtml}</p>`);
+      addBubble("bot", `<p class="ai-reason">${toReasonHtml(data.reply)}</p>`);
 
       history.push({ role: "user", text });
       history.push({ role: "bot", text: data.reply });
