@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로또 추첨기</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="global-nav" aria-label="전역 메뉴">
+    <span class="global-nav__brand">로또</span>
+    <div class="global-nav__links">
+      <a class="global-nav__link" href="#draw">번호 추첨</a>
+      <a class="global-nav__link" href="#winner">역대 1등</a>
+      <a class="global-nav__link" href="#history">추첨 기록</a>
+    </div>
+  </nav>
+
+  <nav class="sub-nav" aria-label="페이지 메뉴">
+    <span class="sub-nav__title">로또 추첨기</span>
+    <button type="button" class="btn btn-primary btn-primary--compact" id="drawBtnTop">추첨하기</button>
+  </nav>
+
+  <header class="tile tile--dark hero-tile">
+    <div class="tile__inner">
+      <h1 class="hero-tile__title">로또 추첨기</h1>
+      <p class="hero-tile__tagline">1~45 중 6개 번호를 무작위로 추첨합니다.</p>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="tile tile--broadcast" id="draw" aria-live="polite">
+      <div class="tile__inner tile__inner--broadcast">
+        <div class="lotto-broadcast" id="drawBroadcast">
+          <header class="broadcast-header">
+            <div class="broadcast-header__left">
+              <span class="broadcast-live broadcast-live--idle" id="broadcastLive">STBY</span>
+              <span class="broadcast-round" id="broadcastRound">추첨 준비</span>
+            </div>
+            <h2 class="broadcast-title">로또 6/45 번호 추첨</h2>
+            <p class="broadcast-status" id="drawStatus">추첨하기 버튼을 눌러 주세요</p>
+          </header>
+
+          <div class="lotto-machine">
+            <div class="machine-frame">
+              <div class="machine-drum" id="machineDrum">
+                <div class="drum-swirl" aria-hidden="true"></div>
+                <div class="drum-inner" id="drumInner" aria-hidden="true"></div>
+                <div class="drum-shine"></div>
+              </div>
+              <div class="machine-chute">
+                <div class="chute-track"></div>
+                <div class="chute-ball hidden" id="chuteBall"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ball-rack" id="balls">
+            <div class="ball-slot" data-index="0">
+              <span class="ball-slot__order">1</span>
+              <div class="ball placeholder">?</div>
+            </div>
+            <div class="ball-slot" data-index="1">
+              <span class="ball-slot__order">2</span>
+              <div class="ball placeholder">?</div>
+            </div>
+            <div class="ball-slot" data-index="2">
+              <span class="ball-slot__order">3</span>
+              <div class="ball placeholder">?</div>
+            </div>
+            <div class="ball-slot" data-index="3">
+              <span class="ball-slot__order">4</span>
+              <div class="ball placeholder">?</div>
+            </div>
+            <div class="ball-slot" data-index="4">
+              <span class="ball-slot__order">5</span>
+              <div class="ball placeholder">?</div>
+            </div>
+            <div class="ball-slot" data-index="5">
+              <span class="ball-slot__order">6</span>
+              <div class="ball placeholder">?</div>
+            </div>
+          </div>
+
+          <div class="bonus-broadcast hidden" id="bonusRow">
+            <span class="bonus-plus">+</span>
+            <div class="bonus-broadcast__label">
+              <span class="bonus-label">보너스 번호</span>
+              <div class="ball-slot ball-slot--bonus" id="bonusSlot">
+                <div class="ball bonus placeholder" id="bonusBall">?</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tile tile--parchment">
+      <div class="tile__inner tile__inner--narrow">
+        <div class="controls">
+          <div class="control-row">
+            <label class="toggle">
+              <input type="checkbox" id="includeBonus">
+              <span>보너스 번호 포함</span>
+            </label>
+            <label class="field">
+              <span class="field__label">한 번에 생성</span>
+              <select id="setCount" class="select-input">
+                <option value="1">1세트</option>
+                <option value="3">3세트</option>
+                <option value="5" selected>5세트</option>
+                <option value="10">10세트</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="button-row">
+            <button type="button" class="btn btn-primary" id="drawBtn">추첨하기</button>
+            <button type="button" class="btn btn-secondary-pill" id="copyBtn" disabled>복사하기</button>
+            <button type="button" class="btn btn-text-link" id="clearBtn">기록 지우기</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tile tile--light winner-section" id="winner">
+      <div class="tile__inner tile__inner--narrow">
+        <div class="tile__head-row">
+          <h2 class="tile__headline">역대 1등 조회</h2>
+          <span class="chip chip--selected" id="winnerLatestLabel"></span>
+        </div>
+        <p class="tile__lead">회차별 당첨번호와 1등 당첨금을 확인할 수 있습니다.</p>
+
+        <div class="winner-search">
+          <label class="field winner-field">
+            <span class="field__label">회차</span>
+            <input type="number" class="search-input" id="roundInput" min="1" placeholder="예: 1200" inputmode="numeric">
+          </label>
+          <button type="button" class="btn btn-secondary-pill" id="roundSearchBtn">조회</button>
+          <div class="winner-nav">
+            <button type="button" class="btn btn-icon-circular" id="roundPrevBtn" title="이전 회차" disabled aria-label="이전 회차">‹</button>
+            <button type="button" class="btn btn-icon-circular" id="roundNextBtn" title="다음 회차" disabled aria-label="다음 회차">›</button>
+          </div>
+        </div>
+
+        <div class="winner-result" id="winnerResult">
+          <p class="winner-placeholder">회차를 입력하고 조회하면 당첨번호와 1등 당첨금을 확인할 수 있습니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="tile tile--parchment history-section" id="history">
+      <div class="tile__inner tile__inner--narrow">
+        <div class="tile__head-row">
+          <h2 class="tile__headline">추첨 기록</h2>
+          <span class="chip" id="historyCount">0세트</span>
+        </div>
+        <ul class="history-list" id="historyList">
+          <li class="history-empty">아직 추첨 기록이 없습니다. 추첨하기를 눌러보세요!</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>※ 본 추첨기는 순수 무작위 번호 생성기이며, 당첨을 보장하지 않습니다.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
