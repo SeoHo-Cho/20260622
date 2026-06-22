@@ -11,6 +11,7 @@
     <span class="global-nav__brand">로또</span>
     <div class="global-nav__links">
       <a class="global-nav__link" href="#draw">번호 추첨</a>
+      <a class="global-nav__link" href="#ai-pick">AI 추천</a>
       <a class="global-nav__link" href="#winner">역대 1등</a>
       <a class="global-nav__link" href="#history">추첨 기록</a>
     </div>
@@ -123,6 +124,39 @@
       </div>
     </section>
 
+    <section class="tile tile--light ai-section" id="ai-pick">
+      <div class="tile__inner tile__inner--narrow">
+        <div class="tile__head-row">
+          <h2 class="tile__headline">AI 행운번호 추천</h2>
+          <span class="chip chip--selected">Gemini 2.5 Flash</span>
+        </div>
+        <p class="tile__lead">성별과 생년월일을 알려주시면 AI가 행운의 번호 6개와 보너스 번호를 추천하고, 왜 그렇게 추천했는지 이유를 설명해 드려요.</p>
+
+        <form class="ai-form" id="aiForm">
+          <label class="field">
+            <span class="field__label">성별</span>
+            <select id="aiGender" class="select-input" required>
+              <option value="" disabled selected>선택</option>
+              <option value="남성">남성</option>
+              <option value="여성">여성</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field__label">생년월일</span>
+            <input type="date" id="aiBirth" class="search-input" required>
+          </label>
+          <button type="submit" class="btn btn-primary" id="aiSubmit">번호 추천받기</button>
+        </form>
+
+        <div class="ai-chat" id="aiChat" aria-live="polite"></div>
+
+        <form class="ai-followup hidden" id="aiFollowForm">
+          <input type="text" id="aiFollowInput" class="search-input" placeholder="추천 번호에 대해 더 물어보세요" autocomplete="off">
+          <button type="submit" class="btn btn-secondary-pill" id="aiFollowSubmit">보내기</button>
+        </form>
+      </div>
+    </section>
+
     <section class="tile tile--light winner-section" id="winner">
       <div class="tile__inner tile__inner--narrow">
         <div class="tile__head-row">
@@ -167,5 +201,6 @@
   </footer>
 
   <script src="app.js"></script>
+  <script src="chatbot.js"></script>
 </body>
 </html>

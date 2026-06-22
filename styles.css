@@ -1228,3 +1228,116 @@ a {
     font-size: 28px;
   }
 }
+
+/* ===== AI 행운번호 추천 챗봇 ===== */
+.ai-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.ai-form .field {
+  flex: 1 1 160px;
+}
+
+.ai-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 28px;
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.ai-chat:empty {
+  display: none;
+}
+
+.ai-bubble {
+  max-width: 86%;
+  padding: 16px 18px;
+  border-radius: 18px;
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: -0.2px;
+  animation: ai-bubble-in 0.3s ease both;
+}
+
+@keyframes ai-bubble-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ai-bubble--user {
+  align-self: flex-end;
+  background: var(--primary);
+  color: var(--on-primary);
+  border-bottom-right-radius: 6px;
+}
+
+.ai-bubble--user strong {
+  font-weight: 600;
+}
+
+.ai-bubble--bot {
+  align-self: flex-start;
+  background: var(--canvas-parchment);
+  color: var(--ink);
+  border-bottom-left-radius: 6px;
+}
+
+.ai-balls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ai-reason {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-muted-80);
+}
+
+.ai-reason.ai-error {
+  color: var(--error);
+}
+
+.ai-typing {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.ai-typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-muted-48);
+  animation: ai-typing-bounce 1s infinite ease-in-out;
+}
+
+.ai-typing span:nth-child(2) { animation-delay: 0.15s; }
+.ai-typing span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes ai-typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
+.ai-followup {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.ai-followup .search-input {
+  flex: 1;
+}
+
+.ai-followup.hidden {
+  display: none;
+}
