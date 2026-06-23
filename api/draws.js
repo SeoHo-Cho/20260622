@@ -10,14 +10,15 @@
 const TABLE = "lotto_draws";
 
 function getConfig() {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // 환경변수에 끼어든 공백/줄바꿈/따옴표/끝 슬래시를 모두 제거한다.
+  const url = (process.env.SUPABASE_URL || "").trim().replace(/^["']|["']$/g, "").replace(/\/+$/, "");
+  const key = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim().replace(/^["']|["']$/g, "");
   if (!url || !key) {
     throw new Error(
       "SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY 환경변수가 설정되지 않았습니다."
     );
   }
-  return { url: url.replace(/\/$/, ""), key };
+  return { url, key };
 }
 
 function supabaseHeaders(key, extra = {}) {
