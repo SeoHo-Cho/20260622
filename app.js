@@ -30,6 +30,7 @@ const winnerLatestLabelEl = document.getElementById("winnerLatestLabel");
 const LOTTO_DATA_URL = "https://smok95.github.io/lotto/results/all.json";
 const DHLOTTERY_URL =
   "https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=";
+const DRAWS_API_URL = "/api/draws";
 
 let lottoDataMap = null;
 let lottoMaxRound = 0;
@@ -538,6 +539,45 @@ function showToast(message) {
   showToast._timer = setTimeout(() => toast.classList.remove("show"), 2000);
 }
 
+// Supabase(서버리스 함수 /api/draws)에 추첨 세트를 저장한다.
+async function saveDrawsToSupabase(sets) {
+  try {
+    const res = await fetch(DRAWS_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sets: sets.map((s) => ({ numbers: s.main, bonus: s.bonus })),
+      }),
+    });
+    if (!res.ok) throw new Error(`save failed: ${res.status}`);
+  } catch (err) {
+    // 저장 실패해도 추첨 자체는 정상 동작하도록 조용히 처리한다.
+    console.warn("추첨 기록 저장 실패:", err);
+    showToast("추첨 기록을 서버에 저장하지 못했습니다.");
+  }
+}
+
+// 페이지 진입 시 최근 저장된 추첨 기록을 불러온다.
+async function loadDrawsFromSupabase() {
+  try {
+    const res = await fetch(`${DRAWS_API_URL}?limit=50`);
+    if (!res.ok) throw new Error(`load failed: ${res.status}`);
+
+    const data = await res.json();
+    const draws = Array.isArray(data?.draws) ? data.draws : [];
+    history = draws.map((d) => ({
+      main: d.numbers,
+      bonus: d.bonus ?? null,
+      time: new Date(d.created_at),
+    }));
+    latestResult = history[0] ?? null;
+    renderHistory();
+  } catch (err) {
+    // 서버 연동 전(로컬 파일 직접 열기 등)에는 조용히 넘어간다.
+    console.warn("추첨 기록 불러오기 실패:", err);
+  }
+}
+
 async function handleDraw() {
   if (isDrawing) return;
 
@@ -559,6 +599,8 @@ async function handleDraw() {
 
   history = [...newSets, ...history].slice(0, 50);
   renderHistory();
+
+  saveDrawsToSupabase(newSets);
 
   isDrawing = false;
   drawBtn.disabled = false;
@@ -619,4 +661,5 @@ populateDrumBalls();
 setBroadcastLive(false);
 
 renderHistory();
+loadDrawsFromSupabase();
 initWinnerLookup();
