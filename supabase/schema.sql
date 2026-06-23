@@ -5,7 +5,7 @@ create table if not exists public.lotto_draws (
   id          bigint generated always as identity primary key,
   numbers     int[]       not null,          -- 메인 번호 6개 (정렬됨)
   bonus       int,                            -- 보너스 번호 (없으면 null)
-  created_at  timestamptz not null default now()
+  created_at  timestamptz not null default now()  -- 저장 시 api/draws.js 가 KST(+09:00) 값으로 채움
 );
 
 -- 최근 기록 조회용 인덱스

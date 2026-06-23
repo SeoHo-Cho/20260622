@@ -51,6 +51,14 @@ function sanitizeBonus(bonus, main) {
   return null;
 }
 
+// 현재 시각을 한국시간(KST, UTC+9) 오프셋이 붙은 ISO 문자열로 만든다.
+// 예) "2026-06-23T15:04:05+09:00"
+function nowKstIso() {
+  // sv-SE 로케일은 "YYYY-MM-DD HH:MM:SS" 형식을 준다.
+  const wall = new Date().toLocaleString("sv-SE", { timeZone: "Asia/Seoul" });
+  return `${wall.replace(" ", "T")}+09:00`;
+}
+
 // 클라이언트가 보낸 추첨 세트 목록을 DB 행으로 변환한다.
 function buildRows(body) {
   const rawSets = Array.isArray(body?.sets)
@@ -59,11 +67,16 @@ function buildRows(body) {
     ? [{ numbers: body.numbers, bonus: body.bonus }]
     : [];
 
+  const createdAt = nowKstIso();
   const rows = [];
   for (const set of rawSets) {
     const numbers = sanitizeNumbers(set?.numbers);
     if (!numbers) continue; // 잘못된 세트는 건너뛴다.
-    rows.push({ numbers, bonus: sanitizeBonus(set?.bonus, numbers) });
+    rows.push({
+      numbers,
+      bonus: sanitizeBonus(set?.bonus, numbers),
+      created_at: createdAt,
+    });
   }
   return rows;
 }
